@@ -1,5 +1,7 @@
 # CRF Ingredient Phrase Tagger
 
+[![Build Status](https://travis-ci.org/mtlynch/ingredient-phrase-tagger.svg?branch=master)](https://travis-ci.org/mtlynch/ingredient-phrase-tagger) [![Docker Pulls](https://img.shields.io/docker/pulls/mtlynch/ingredient-phrase-tagger.svg?maxAge=604800)](https://hub.docker.com/r/mtlynch/ingredient-phrase-tagger/) [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE.md)
+
 This repo contains scripts to extract the Quantity, Unit, Name, and Comments
 from unstructured ingredient phrases. We use it on [Cooking][nytc] to format
 incoming recipes. Given the following input:
@@ -33,14 +35,20 @@ CRFs can be found [here][crf_tut].
 On a 2012 Macbook Pro, training the model takes roughly 30 minutes for 130k
 examples using the [CRF++][crfpp] library.
 
-
 ## Development
 
 On OSX:
 
-    brew install crf++
-    python setup.py install
+```bash
+brew install crf++
+python setup.py install
+```
 
+Docker:
+
+```bash
+docker pull mtlynch/ingredient-phrase-tagger
+```
 
 ## Quick Start
 
@@ -111,6 +119,7 @@ See the top of this README for an example of the expected output.
 
 * [Erica Greene][eg]
 * [Adam Mckaig][am]
+* [Michael Lynch](https://github.com/mtlynch)
 
 
 ## License
