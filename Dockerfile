@@ -1,8 +1,8 @@
 FROM ubuntu:16.04
 LABEL maintainer="Michael Lynch <michael@mtlynch.io>"
 
-ENV CRFPP_REPO https://github.com/mtlynch/crfpp.git
-ENV TAGGER_REPO https://github.com/mtlynch/ingredient-phrase-tagger.git
+ARG CRFPP_REPO=https://github.com/mtlynch/crfpp.git
+ARG TAGGER_REPO=https://github.com/mtlynch/ingredient-phrase-tagger.git
 
 RUN apt-get update -y && \
     apt-get upgrade -y && \
