@@ -1,8 +1,9 @@
 FROM ubuntu:16.04
 LABEL maintainer="Michael Lynch <michael@mtlynch.io>"
 
+ADD . ingredient-phrase-tagger
+
 ARG CRFPP_REPO=https://github.com/mtlynch/crfpp.git
-ARG TAGGER_REPO=https://github.com/mtlynch/ingredient-phrase-tagger.git
 
 RUN apt-get update -y && \
     apt-get upgrade -y && \
@@ -17,8 +18,7 @@ RUN git clone "$CRFPP_REPO" && \
     ldconfig && \
     cd ..
 
-RUN git clone "$TAGGER_REPO" && \
-    cd ingredient-phrase-tagger && \
+RUN cd ingredient-phrase-tagger && \
     python setup.py install && \
     cd ..
 
