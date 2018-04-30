@@ -1,4 +1,4 @@
 ---
 sudo: required
 services: docker
-script: docker build .
+script: IMAGE_NAME="travis-build" ./hooks/build
