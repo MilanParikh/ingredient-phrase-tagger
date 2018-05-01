@@ -2,6 +2,20 @@
 
 [![Build Status](https://travis-ci.org/mtlynch/ingredient-phrase-tagger.svg?branch=master)](https://travis-ci.org/mtlynch/ingredient-phrase-tagger) [![Docker Pulls](https://img.shields.io/docker/pulls/mtlynch/ingredient-phrase-tagger.svg?maxAge=604800)](https://hub.docker.com/r/mtlynch/ingredient-phrase-tagger/) [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE.md)
 
+## Fork Notes
+
+This is a fork of the original [NY Times ingredient-phrase-tagger](https://github.com/NYTimes/ingredient-phrase-tagger). This fork is maintained by [Michael Lynch](https://github.com/mtlynch)
+
+This fork maintains the design of the original ingredient-phrase-tagger, but adds bugfixes and additional features to aid in future development:
+
+* Adds a [Docker image](https://hub.docker.com/r/mtlynch/ingredient-phrase-tagger/) for easy deployment.
+* Adds a [continuous integration build](https://travis-ci.org/mtlynch/ingredient-phrase-tagger) on every check-in.
+* Adds unit tests.
+* Adds end-to-end tests.
+* Enforces rules for source formatting and linting.
+
+## Overview
+
 This repo contains scripts to extract the Quantity, Unit, Name, and Comments
 from unstructured ingredient phrases. We use it on [Cooking][nytc] to format
 incoming recipes. Given the following input:
