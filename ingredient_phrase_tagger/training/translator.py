@@ -94,9 +94,7 @@ def _matchUp(token, labels):
     decimalToken = _parseNumbers(token)
 
     # Iterate through the labels in descending order of label importance.
-    # TODO(mtlynch): Reorder this list so that it is in better order of
-    # importance.
-    for label_key in ['name', 'qty', 'range_end', 'unit', 'comment']:
+    for label_key in ['name', 'unit', 'qty', 'comment', 'range_end']:
         label_value = labels[label_key]
         if isinstance(label_value, basestring):
             for n, vt in enumerate(utils.tokenize(label_value)):
