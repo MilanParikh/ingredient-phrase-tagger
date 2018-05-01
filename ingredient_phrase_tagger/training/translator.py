@@ -1,6 +1,7 @@
 import decimal
 import re
 
+import tokenizer
 import utils
 
 
@@ -19,7 +20,7 @@ def translate_row(row):
     """
     # extract the display name
     display_input = utils.cleanUnicodeFractions(row['input'])
-    tokens = utils.tokenize(display_input)
+    tokens = tokenizer.tokenize(display_input)
 
     labels = _row_to_labels(row)
     label_data = _addPrefixes([(t, _matchUp(t, labels)) for t in tokens])
@@ -97,7 +98,7 @@ def _matchUp(token, labels):
     for label_key in ['name', 'unit', 'qty', 'comment', 'range_end']:
         label_value = labels[label_key]
         if isinstance(label_value, basestring):
-            for n, vt in enumerate(utils.tokenize(label_value)):
+            for n, vt in enumerate(tokenizer.tokenize(label_value)):
                 if utils.normalizeToken(vt) == token:
                     ret.append(label_key.upper())
 
