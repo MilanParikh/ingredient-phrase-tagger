@@ -1,5 +1,5 @@
+import csv
 import optparse
-import pandas as pd
 
 import translator
 
@@ -18,20 +18,23 @@ class Cli(object):
         Generates training data in the CRF++ format for the ingredient
         tagging task
         """
-        df = pd.read_csv(self.opts.data_path)
-        df = df.fillna("")
 
         start = int(offset)
         end = int(offset) + int(count)
 
-        df_slice = df.iloc[start:end]
+        with open(self.opts.data_path) as csv_file:
+            csv_reader = csv.DictReader(csv_file)
+            for index, row in enumerate(csv_reader):
+                if index < start or index >= end:
+                    continue
 
-        for index, row in df_slice.iterrows():
-            try:
-                print translator.translate_row(row)
-            # ToDo: deal with this
-            except UnicodeDecodeError:
-                print ''
+                _coerce_values_to_numbers(row)
+
+                try:
+                    print translator.translate_row(row)
+                # ToDo: deal with this
+                except UnicodeDecodeError:
+                    print ''
 
     def _parse_args(self, argv):
         """
@@ -49,3 +52,21 @@ class Cli(object):
 
         (options, args) = opts.parse_args(argv)
         return options
+
+
+def _coerce_values_to_numbers(row):
+    """Converts string values in a row to numbers where possible.
+
+    Args:
+        row: A row of labelled ingredient data. This is modified in place so
+            that any of its values that contain a number (e.g. "6.4") are
+            converted to floats and the 'index' value is converted to an int.
+    """
+    for key in row:
+        if key == 'index':
+            row[key] = int(row[key])
+        else:
+            try:
+                row[key] = float(row[key])
+            except ValueError:
+                pass

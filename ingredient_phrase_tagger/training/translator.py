@@ -77,7 +77,12 @@ def _matchUp(token, ingredientRow):
     token = utils.normalizeToken(token)
     decimalToken = _parseNumbers(token)
 
-    for key, val in ingredientRow.iteritems():
+    # Note: We iterate in this specific order to preserve parity with the
+    # legacy implementation. The legacy implementation is likely incorrect and
+    # shouldn't actually include 'index', but we will revisit when we're ready
+    # to change behavior.
+    for key in ['index', 'name', 'qty', 'range_end', 'unit', 'comment']:
+        val = ingredientRow[key]
         if isinstance(val, basestring):
 
             for n, vt in enumerate(utils.tokenize(val)):

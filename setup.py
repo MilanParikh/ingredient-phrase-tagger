@@ -5,7 +5,7 @@ from setuptools import setup, find_packages
 
 import ingredient_phrase_tagger
 
-requires, extra = ['Unidecode==1.0.22', 'pandas==0.22.0'], {}
+requires, extra = ['Unidecode==1.0.22'], {}
 if sys.version_info >= (3,):
     extra['use_2to3'] = True
 

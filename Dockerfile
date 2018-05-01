@@ -1,4 +1,4 @@
-FROM mtlynch/crfpp:pandas
+FROM mtlynch/crfpp
 LABEL maintainer="Michael Lynch <michael@mtlynch.io>"
 
 ARG BUILD_DATE
