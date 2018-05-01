@@ -26,13 +26,13 @@ bin/generate_data \
   --count="$COUNT_TRAIN" \
   --offset=0 > "$CRF_TRAINING_FILE"
 
-diff "$CRF_TRAINING_FILE" "$GOLDEN_CRF_TRAINING_FILE"
+diff "$GOLDEN_CRF_TRAINING_FILE" "$CRF_TRAINING_FILE"
 
 bin/generate_data \
   --data-path="$LABELLED_DATA_FILE" \
   --count="$COUNT_TEST" \
   --offset=$COUNT_TRAIN > "$CRF_TESTING_FILE"
 
-diff "$CRF_TESTING_FILE" "$GOLDEN_CRF_TESTING_FILE"
+diff "$GOLDEN_CRF_TESTING_FILE" "$CRF_TESTING_FILE"
 
 rm -rf $OUTPUT_DIR
