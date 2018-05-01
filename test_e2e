@@ -1,0 +1,38 @@
+#!/bin/bash
+
+# End-to-end test for ingredient-phrase-tagger. Uses generate_data to generate
+# training and test data, then verifies that the generated files match up with
+# the golden version of pre-generated data.
+
+# Exit build script on first failure
+set -e
+
+# Echo commands to stdout.
+set -x
+
+LABELLED_DATA_FILE=nyt-ingredients-snapshot-2015.csv
+COUNT_TRAIN=20000
+COUNT_TEST=2000
+OUTPUT_DIR=$(mktemp -d)
+CRF_TRAINING_FILE="${OUTPUT_DIR}/training_data.crf"
+CRF_TESTING_FILE="${OUTPUT_DIR}/testing_data.crf"
+
+GOLDEN_DIR=tests/golden
+GOLDEN_CRF_TRAINING_FILE="${GOLDEN_DIR}/training_data.crf"
+GOLDEN_CRF_TESTING_FILE="${GOLDEN_DIR}/testing_data.crf"
+
+bin/generate_data \
+  --data-path="$LABELLED_DATA_FILE" \
+  --count="$COUNT_TRAIN" \
+  --offset=0 > "$CRF_TRAINING_FILE"
+
+diff "$CRF_TRAINING_FILE" "$GOLDEN_CRF_TRAINING_FILE"
+
+bin/generate_data \
+  --data-path="$LABELLED_DATA_FILE" \
+  --count="$COUNT_TEST" \
+  --offset=$COUNT_TRAIN > "$CRF_TESTING_FILE"
+
+diff "$CRF_TESTING_FILE" "$GOLDEN_CRF_TESTING_FILE"
+
+rm -rf $OUTPUT_DIR
