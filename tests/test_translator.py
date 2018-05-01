@@ -63,6 +63,26 @@ salt\tI3\tL4\tNoCAP\tNoPAREN\tB-NAME
 """.strip(),
                                   translator.translate_row(row).strip())
 
+    def test_translates_row_with_non_ascii_characters(self):
+        row = {
+            'index': 253,
+            'input': u'2 to 3 teaspoons minced jalape\xc3\xb1o',
+            'name': u'jalape\xc3\xb1os',
+            'qty': 2.0,
+            'range_end': 3.0,
+            'unit': 'teaspoon',
+            'comment': 'minced',
+        }
+
+        self.assertMultiLineEqual(("""
+2\tI1\tL8\tNoCAP\tNoPAREN\tB-QTY
+to\tI2\tL8\tNoCAP\tNoPAREN\tOTHER
+3\tI3\tL8\tNoCAP\tNoPAREN\tB-RANGE_END
+teaspoons\tI4\tL8\tNoCAP\tNoPAREN\tB-UNIT
+minced\tI5\tL8\tNoCAP\tNoPAREN\tB-COMMENT
+""" + u'jalape\xc3\xb1o\tI6\tL8\tNoCAP\tNoPAREN\tOTHER').strip(),
+                                  translator.translate_row(row).strip())
+
     def test_translates_row_with_comment(self):
         row = {
             'index': 412,

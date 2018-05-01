@@ -28,13 +28,9 @@ class Cli(object):
                 if index < start or index >= end:
                     continue
 
-                _coerce_values_to_numbers(row)
+                parsed_row = _parse_row(row)
 
-                try:
-                    print translator.translate_row(row)
-                # ToDo: deal with this
-                except UnicodeDecodeError:
-                    print ''
+                print translator.translate_row(parsed_row).encode('utf-8')
 
     def _parse_args(self, argv):
         """
@@ -54,7 +50,7 @@ class Cli(object):
         return options
 
 
-def _coerce_values_to_numbers(row):
+def _parse_row(row):
     """Converts string values in a row to numbers where possible.
 
     Args:
@@ -62,11 +58,11 @@ def _coerce_values_to_numbers(row):
             that any of its values that contain a number (e.g. "6.4") are
             converted to floats and the 'index' value is converted to an int.
     """
-    for key in row:
-        if key == 'index':
-            row[key] = int(row[key])
-        else:
-            try:
-                row[key] = float(row[key])
-            except ValueError:
-                pass
+    return {
+        'input': row['input'].decode('utf-8'),
+        'name': row['name'].decode('utf-8'),
+        'qty': float(row['qty']),
+        'range_end': float(row['range_end']),
+        'unit': row['unit'].decode('utf-8'),
+        'comment': row['comment'].decode('utf-8'),
+    }

@@ -71,7 +71,7 @@ def cleanUnicodeFractions(s):
     }
 
     for f_unicode, f_ascii in fractions.items():
-        s = s.replace(f_unicode, ' ' + f_ascii)
+        s = s.replace(f_unicode, u' ' + f_ascii)
 
     return s
 
