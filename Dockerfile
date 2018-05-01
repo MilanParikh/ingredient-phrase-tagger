@@ -1,4 +1,4 @@
-FROM ubuntu:16.04
+FROM mtlynch/crfpp
 LABEL maintainer="Michael Lynch <michael@mtlynch.io>"
 
 ARG BUILD_DATE
@@ -10,20 +10,8 @@ LABEL org.label-schema.build-date=$BUILD_DATE \
       org.label-schema.vcs-ref=$VCS_REF \
       org.label-schema.schema-version="1.0.0-rc1"
 
-ARG CRFPP_REPO=https://github.com/mtlynch/crfpp.git
-
 RUN apt-get update -y && \
-    apt-get upgrade -y && \
-    apt-get install -y build-essential git python2.7 python-pip
-
-RUN git clone "$CRFPP_REPO" && \
-    cd crfpp && \
-    ./configure && \
-    make && \
-    make install && \
-    echo "/usr/local/lib" > /etc/ld.so.conf.d/local.conf && \
-    ldconfig && \
-    cd ..
+    apt-get install -y python2.7 python-pip
 
 ADD . /ingredient-phrase-tagger
 WORKDIR /ingredient-phrase-tagger
