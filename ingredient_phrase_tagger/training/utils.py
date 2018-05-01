@@ -15,6 +15,10 @@ def tokenize(s):
     But we must split the text on "cups/" etc. in order to pick it up.
     """
 
+    # handle abbreviation like "100g" by treating it as "100 grams"
+    s = re.sub(r'(\d+)g', r'\1 grams', s)
+    s = re.sub(r'(\d+)oz', r'\1 ounces', s)
+
     american_units = ['cup', 'tablespoon', 'teaspoon', 'pound', 'ounce', 'quart', 'pint']
     for unit in american_units:
         s = s.replace(unit + '/', unit + ' ')
