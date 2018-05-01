@@ -1,4 +1,15 @@
 ---
 sudo: required
+dist: trusty
+language: python
+python:
+  - "2.7"
 services: docker
 script: ./docker_build
+after_success:
+  - pip install pyyaml coveralls
+  - docker cp ingredient-phrase-tagger-container:/ingredient-phrase-tagger/.coverage ./
+  # Fix paths in .coverage so they match Coveralls' expectations of Travis'
+  # paths.
+  - sed -i "s@\"/ingredient-phrase-tagger/@\"${PWD}/@g" .coverage
+  - coveralls
