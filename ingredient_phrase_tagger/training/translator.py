@@ -85,11 +85,8 @@ def _matchUp(token, ingredientRow):
                     ret.append(key.upper())
 
         elif decimalToken is not None:
-            try:
-                if val == decimalToken:
-                    ret.append(key.upper())
-            except:
-                pass
+            if val == decimalToken:
+                ret.append(key.upper())
 
     return ret
 
