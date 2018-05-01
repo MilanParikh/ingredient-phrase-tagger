@@ -10,8 +10,6 @@ LABEL org.label-schema.build-date=$BUILD_DATE \
       org.label-schema.vcs-ref=$VCS_REF \
       org.label-schema.schema-version="1.0.0-rc1"
 
-ADD . ingredient-phrase-tagger
-
 ARG CRFPP_REPO=https://github.com/mtlynch/crfpp.git
 
 RUN apt-get update -y && \
@@ -27,9 +25,10 @@ RUN git clone "$CRFPP_REPO" && \
     ldconfig && \
     cd ..
 
-RUN cd ingredient-phrase-tagger && \
-    python setup.py install && \
-    cd ..
+ADD . /ingredient-phrase-tagger
+WORKDIR /ingredient-phrase-tagger
+
+RUN python setup.py install
 
 # Clean up.
 RUN rm -rf /var/lib/apt/lists/* && \
@@ -37,5 +36,3 @@ RUN rm -rf /var/lib/apt/lists/* && \
     rm -Rf /usr/share/man && \
     apt-get autoremove -y && \
     apt-get clean
-
-WORKDIR /app

@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 import sys
 
-
 if len(sys.argv) < 2:
     sys.stderr.write('Usage: evaluate.py FILENAME')
     sys.exit(1)
@@ -38,7 +37,7 @@ for sentence in sentences:
                 total_words_per_sentence += 1
 
                 if (guess == gold) or (guess[2:] == gold[2:]):
-                    correct_words +=1
+                    correct_words += 1
                     correct_words_per_sentence += 1
 
     if total_words_per_sentence == correct_words_per_sentence:

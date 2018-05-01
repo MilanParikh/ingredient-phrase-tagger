@@ -6,7 +6,6 @@ import json
 
 from ingredient_phrase_tagger.training import utils
 
-
 if len(sys.argv) < 2:
     sys.stderr.write('Usage: make-data.py FILENAME')
     sys.exit(1)

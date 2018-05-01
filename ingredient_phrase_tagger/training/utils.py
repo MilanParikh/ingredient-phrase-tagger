@@ -19,15 +19,19 @@ def tokenize(s):
     s = re.sub(r'(\d+)g', r'\1 grams', s)
     s = re.sub(r'(\d+)oz', r'\1 ounces', s)
 
-    american_units = ['cup', 'tablespoon', 'teaspoon', 'pound', 'ounce', 'quart', 'pint']
+    american_units = [
+        'cup', 'tablespoon', 'teaspoon', 'pound', 'ounce', 'quart', 'pint'
+    ]
     for unit in american_units:
         s = s.replace(unit + '/', unit + ' ')
         s = s.replace(unit + 's/', unit + 's ')
 
     return filter(None, re.split(r'([,\(\)])?\s*', clumpFractions(s)))
 
+
 def joinLine(columns):
     return "\t".join(columns)
+
 
 def clumpFractions(s):
     """
@@ -39,6 +43,7 @@ def clumpFractions(s):
         # => "aaa 1$2/3 bbb"
     """
     return re.sub(r'(\d+)\s+(\d)/(\d)', r'\1$\2/\3', s)
+
 
 def cleanUnicodeFractions(s):
     """
@@ -71,11 +76,13 @@ def cleanUnicodeFractions(s):
 
     return s
 
+
 def unclump(s):
     """
     Replacess $'s with spaces. The reverse of clumpFractions.
     """
     return re.sub(r'\$', " ", s)
+
 
 def normalizeToken(s):
     """
@@ -85,18 +92,17 @@ def normalizeToken(s):
     """
     return singularize(s)
 
+
 def getFeatures(token, index, tokens):
     """
     Returns a list of features for a given token.
     """
     length = len(tokens)
 
-    return [
-        ("I%s" % index),
-        ("L%s" % lengthGroup(length)),
-        ("Yes" if isCapitalized(token) else "No") + "CAP",
-        ("Yes" if insideParenthesis(token, tokens) else "No") + "PAREN"
-    ]
+    return [("I%s" % index), ("L%s" % lengthGroup(length)),
+            ("Yes" if isCapitalized(token) else "No") + "CAP",
+            ("Yes" if insideParenthesis(token, tokens) else "No") + "PAREN"]
+
 
 def singularize(word):
     """
@@ -136,11 +142,13 @@ def singularize(word):
     else:
         return word
 
+
 def isCapitalized(token):
     """
     Returns true if a given token starts with a capital letter.
     """
     return re.match(r'^[A-Z]', token) is not None
+
 
 def lengthGroup(actualLength):
     """
@@ -152,6 +160,7 @@ def lengthGroup(actualLength):
 
     return "X"
 
+
 def insideParenthesis(token, tokens):
     """
     Returns true if the word is inside parenthesis in the phrase.
@@ -160,7 +169,9 @@ def insideParenthesis(token, tokens):
         return True
     else:
         line = " ".join(tokens)
-        return re.match(r'.*\(.*'+re.escape(token)+'.*\).*',  line) is not None
+        return re.match(r'.*\(.*' + re.escape(token) + '.*\).*',
+                        line) is not None
+
 
 def displayIngredient(ingredient):
     """
@@ -174,6 +185,7 @@ def displayIngredient(ingredient):
         "<span class='%s'>%s</span>" % (tag, " ".join(tokens))
         for tag, tokens in ingredient
     ])
+
 
 # HACK: fix this
 def smartJoin(words):
@@ -280,10 +292,11 @@ def import_data(lines):
 
     # reassemble the output into a list of dicts.
     output = [
-        dict([(k, smartJoin(tokens)) for k, tokens in ingredient.iteritems()])
+        dict([(k, smartJoin(tokens))
+              for k, tokens in ingredient.iteritems()])
         for ingredient in data
         if len(ingredient)
-        ]
+    ]
     # Add the marked-up display data
     for i, v in enumerate(output):
         output[i]["display"] = displayIngredient(display[i])
@@ -304,7 +317,7 @@ def export_data(lines):
         tokens = tokenize(line_clean)
 
         for i, token in enumerate(tokens):
-            features = getFeatures(token, i+1, tokens)
+            features = getFeatures(token, i + 1, tokens)
             output.append(joinLine([token] + features))
         output.append('')
     return '\n'.join(output)
