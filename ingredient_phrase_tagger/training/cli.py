@@ -58,11 +58,17 @@ def _parse_row(row):
             that any of its values that contain a number (e.g. "6.4") are
             converted to floats and the 'index' value is converted to an int.
     """
+    # Certain rows have range_end set to empty.
+    if row['range_end'] == '':
+        range_end = 0.0
+    else:
+        range_end = float(row['range_end'])
+
     return {
         'input': row['input'].decode('utf-8'),
         'name': row['name'].decode('utf-8'),
         'qty': float(row['qty']),
-        'range_end': float(row['range_end']),
+        'range_end': range_end,
         'unit': row['unit'].decode('utf-8'),
         'comment': row['comment'].decode('utf-8'),
     }
