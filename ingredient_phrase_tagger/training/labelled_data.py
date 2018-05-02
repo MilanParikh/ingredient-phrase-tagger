@@ -1,0 +1,76 @@
+import csv
+
+_REQUIRED_COLUMNS = ['input', 'name', 'qty', 'range_end', 'unit', 'comment']
+
+
+class Error(Exception):
+    pass
+
+
+class InvalidHeaderError(Error):
+    pass
+
+
+class Reader(object):
+    """Reads labelled ingredient data formatted as a CSV.
+
+    Input data must be a CSV file, encoded in UTF-8, and containing the
+    following columns:
+
+        input
+        name
+        qty
+        range_end
+        unit
+        comment
+    """
+
+    def __init__(self, data_file):
+        self._csv_reader = csv.DictReader(data_file)
+        for required_column in _REQUIRED_COLUMNS:
+            if required_column not in self._csv_reader.fieldnames:
+                raise InvalidHeaderError(
+                    'Data file is missing required column: %s' %
+                    required_column)
+
+    def __iter__(self):
+        return self
+
+    def next(self):
+        return _parse_row(self._csv_reader.next())
+
+
+def _parse_row(row):
+    """Parses a row of raw data from a labelled ingredient CSV file.
+
+    Args:
+        row: A row of labelled ingredient data. This is modified in place so
+            that any of its values that contain a number (e.g. "6.4") are
+            converted to floats and the 'index' value is converted to an int.
+
+    Returns:
+        A dictionary representing the row's values, for example:
+
+        {
+            'input': '1/2 cup yellow cornmeal',
+            'name': 'yellow cornmeal',
+            'qty': 0.5,
+            'range_end': 0.0,
+            'unit': 'cup',
+            'comment': '',
+        }
+    """
+    # Certain rows have range_end set to empty.
+    if row['range_end'] == '':
+        range_end = 0.0
+    else:
+        range_end = float(row['range_end'])
+
+    return {
+        'input': row['input'].decode('utf-8'),
+        'name': row['name'].decode('utf-8'),
+        'qty': float(row['qty']),
+        'range_end': range_end,
+        'unit': row['unit'].decode('utf-8'),
+        'comment': row['comment'].decode('utf-8'),
+    }

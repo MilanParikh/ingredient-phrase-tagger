@@ -1,6 +1,6 @@
-import csv
 import optparse
 
+import labelled_data
 import translator
 
 
@@ -22,15 +22,13 @@ class Cli(object):
         start = int(offset)
         end = int(offset) + int(count)
 
-        with open(self.opts.data_path) as csv_file:
-            csv_reader = csv.DictReader(csv_file)
-            for index, row in enumerate(csv_reader):
+        with open(self.opts.data_path) as data_file:
+            data_reader = labelled_data.Reader(data_file)
+            for index, row in enumerate(data_reader):
                 if index < start or index >= end:
                     continue
 
-                parsed_row = _parse_row(row)
-
-                print translator.translate_row(parsed_row).encode('utf-8')
+                print translator.translate_row(row).encode('utf-8')
 
     def _parse_args(self, argv):
         """
@@ -48,27 +46,3 @@ class Cli(object):
 
         (options, args) = opts.parse_args(argv)
         return options
-
-
-def _parse_row(row):
-    """Converts string values in a row to numbers where possible.
-
-    Args:
-        row: A row of labelled ingredient data. This is modified in place so
-            that any of its values that contain a number (e.g. "6.4") are
-            converted to floats and the 'index' value is converted to an int.
-    """
-    # Certain rows have range_end set to empty.
-    if row['range_end'] == '':
-        range_end = 0.0
-    else:
-        range_end = float(row['range_end'])
-
-    return {
-        'input': row['input'].decode('utf-8'),
-        'name': row['name'].decode('utf-8'),
-        'qty': float(row['qty']),
-        'range_end': range_end,
-        'unit': row['unit'].decode('utf-8'),
-        'comment': row['comment'].decode('utf-8'),
-    }
