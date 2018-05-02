@@ -1,8 +1,9 @@
 #!/bin/bash
 
-# End-to-end test for ingredient-phrase-tagger. Uses generate_data to generate
-# training and test data, then verifies that the generated files match up with
-# the golden version of pre-generated data.
+# End-to-end test for ingredient-phrase-tagger.
+#
+# Trains a new model using a known set of labelled data then verifies that all
+# generated outputs match the golden outputs.
 
 # Exit build script on first failure
 set -e
@@ -10,54 +11,30 @@ set -e
 # Echo commands to stdout.
 set -x
 
-LABELLED_DATA_FILE=nyt-ingredients-snapshot-2015.csv
-LABELLED_EXAMPLE_COUNT=22000
-TRAINING_DATA_PERCENT=0.9
-COUNT_TRAIN=$(python -c "print int($TRAINING_DATA_PERCENT * $LABELLED_EXAMPLE_COUNT)")
-COUNT_TEST=$(python -c "print int((1.0 - $TRAINING_DATA_PERCENT) * $LABELLED_EXAMPLE_COUNT)")
-OUTPUT_DIR=$(mktemp -d)
-CRF_TRAINING_FILE="${OUTPUT_DIR}/training_data.crf"
-CRF_TESTING_FILE="${OUTPUT_DIR}/testing_data.crf"
-
-CRF_LEARN_TEMPLATE=template_file
+export LABELLED_DATA_FILE=nyt-ingredients-snapshot-2015.csv
+export LABELLED_EXAMPLE_COUNT=22000
+export TRAINING_DATA_PERCENT=0.9
 # This needs to be explicit so that there is consistent training between
 # different machines.
-CRF_TRAINING_THREADS=2
-CRF_MODEL_FILE="${OUTPUT_DIR}/crf_model"
+export CRF_TRAINING_THREADS=2
 
-TESTING_OUTPUT_FILE="${OUTPUT_DIR}/testing_output"
-EVAL_OUTPUT_FILE="${OUTPUT_DIR}/eval_output"
+export OUTPUT_DIR=$(mktemp -d)
+ACTUAL_TRAINING_FILE="${OUTPUT_DIR}/training_data.crf"
+ACTUAL_TESTING_FILE="${OUTPUT_DIR}/testing_data.crf"
+ACTUAL_EVAL_OUTPUT_FILE="${OUTPUT_DIR}/eval_output"
 
+# Train a new model.
+bin/train-model
+cat "$ACTUAL_EVAL_OUTPUT_FILE"
+
+# Check against golden output.
 GOLDEN_DIR=tests/golden
 GOLDEN_CRF_TRAINING_FILE="${GOLDEN_DIR}/training_data.crf"
 GOLDEN_CRF_TESTING_FILE="${GOLDEN_DIR}/testing_data.crf"
 GOLDEN_EVAL_OUTPUT_FILE="${GOLDEN_DIR}/eval_output"
 
-bin/generate_data \
-  --data-path="$LABELLED_DATA_FILE" \
-  --count="$COUNT_TRAIN" \
-  --offset=0 > "$CRF_TRAINING_FILE"
-
-diff --context=2 "$GOLDEN_CRF_TRAINING_FILE" "$CRF_TRAINING_FILE"
-
-bin/generate_data \
-  --data-path="$LABELLED_DATA_FILE" \
-  --count="$COUNT_TEST" \
-  --offset=$COUNT_TRAIN > "$CRF_TESTING_FILE"
-
-diff --context=2 "$GOLDEN_CRF_TESTING_FILE" "$CRF_TESTING_FILE"
-
-crf_learn \
-  --thread="$CRF_TRAINING_THREADS" \
-  "$CRF_LEARN_TEMPLATE" "$CRF_TESTING_FILE" "$CRF_MODEL_FILE"
-
-crf_test \
-  --model="$CRF_MODEL_FILE" \
-  "$CRF_TESTING_FILE" > "$TESTING_OUTPUT_FILE"
-
-python bin/evaluate.py "$TESTING_OUTPUT_FILE" > "$EVAL_OUTPUT_FILE"
-cat "$EVAL_OUTPUT_FILE"
-
-diff "$GOLDEN_EVAL_OUTPUT_FILE" "$EVAL_OUTPUT_FILE"
+diff --context=2 "$GOLDEN_CRF_TRAINING_FILE" "$ACTUAL_TRAINING_FILE"
+diff --context=2 "$GOLDEN_CRF_TESTING_FILE" "$ACTUAL_TESTING_FILE"
+diff "$GOLDEN_EVAL_OUTPUT_FILE" "$ACTUAL_EVAL_OUTPUT_FILE"
 
 rm -rf $OUTPUT_DIR

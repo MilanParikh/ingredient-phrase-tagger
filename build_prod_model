@@ -1,0 +1,31 @@
+#!/bin/bash
+
+# Builds a new model using production settings.
+#
+# Example
+#  $ mkdir ~/model
+#  $ ./build_prod_model ~/model
+#
+# Trains a new model using a known set of labelled data then verifies that all
+# generated outputs match the golden outputs.
+
+# Exit build script on first failure
+set -e
+
+# Echo commands to stdout.
+set -x
+
+export LABELLED_DATA_FILE=nyt-ingredients-snapshot-2015.csv
+export LABELLED_EXAMPLE_COUNT=179207
+export TRAINING_DATA_PERCENT=0.9
+if [ -z "$1" ];
+  then echo "Usage: ./build_prod_model output_dir";
+fi
+export OUTPUT_DIR="$1"
+
+# Train a new model.
+bin/train-model
+cat "${OUTPUT_DIR}/eval_output"
+
+MODEL_FILE="$(ls ${OUTPUT_DIR}/*.crfmodel)"
+echo "Created new model: $MODEL_FILE"

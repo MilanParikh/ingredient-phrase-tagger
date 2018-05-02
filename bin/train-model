@@ -1,0 +1,64 @@
+#!/bin/bash
+
+# Trains a new CRF model given a set of labelled data.
+
+# Exit build script on first failure
+set -e
+
+# Echo commands to stdout.
+set -x
+
+# Check required vars.
+if [ -z "$LABELLED_DATA_FILE" ];
+  then echo "LABELLED_DATA_FILE must be set" && exit 1;
+fi
+if [ -z "$LABELLED_EXAMPLE_COUNT" ];
+  then echo "LABELLED_EXAMPLE_COUNT must be set" && exit 1;
+fi
+if [ -z "$OUTPUT_DIR" ];
+  then echo "OUTPUT_DIR must be set" && exit 1;
+fi
+
+# Choose defaults for optional vars.
+if [ -z "$TRAINING_DATA_PERCENT" ];
+  then TRAINING_DATA_PERCENT=0.9;
+fi
+if [ -z "$CRF_TRAINING_THREADS" ];
+  then CRF_TRAINING_THREADS=2;
+fi
+
+COUNT_TRAIN=$(python -c "print int($TRAINING_DATA_PERCENT * $LABELLED_EXAMPLE_COUNT)")
+COUNT_TEST=$(python -c "print int((1.0 - $TRAINING_DATA_PERCENT) * $LABELLED_EXAMPLE_COUNT)")
+
+CRF_TRAINING_FILE="${OUTPUT_DIR}/training_data.crf"
+CRF_TESTING_FILE="${OUTPUT_DIR}/testing_data.crf"
+
+CRF_LEARN_TEMPLATE=template_file
+
+MODEL_TIMESTAMP=$(date +%Y%m%d_%H%M)
+DATA_VERSION="${LABELLED_DATA_FILE/\.csv/}"
+CODE_VERSION=$(git rev-parse --short HEAD)
+
+CRF_MODEL_FILE="${OUTPUT_DIR}/${MODEL_TIMESTAMP}-${DATA_VERSION}-${CODE_VERSION}.crfmodel"
+TESTING_OUTPUT_FILE="${OUTPUT_DIR}/testing_output"
+EVAL_OUTPUT_FILE="${OUTPUT_DIR}/eval_output"
+
+bin/generate_data \
+  --data-path="$LABELLED_DATA_FILE" \
+  --count="$COUNT_TRAIN" \
+  --offset=0 > "$CRF_TRAINING_FILE"
+
+bin/generate_data \
+  --data-path="$LABELLED_DATA_FILE" \
+  --count="$COUNT_TEST" \
+  --offset=$COUNT_TRAIN > "$CRF_TESTING_FILE"
+
+crf_learn \
+  --thread="$CRF_TRAINING_THREADS" \
+  "$CRF_LEARN_TEMPLATE" "$CRF_TESTING_FILE" "$CRF_MODEL_FILE"
+
+crf_test \
+  --model="$CRF_MODEL_FILE" \
+  "$CRF_TESTING_FILE" > "$TESTING_OUTPUT_FILE"
+
+python bin/evaluate.py "$TESTING_OUTPUT_FILE" > "$EVAL_OUTPUT_FILE"

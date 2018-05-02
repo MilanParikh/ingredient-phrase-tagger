@@ -11,7 +11,7 @@ LABEL org.label-schema.build-date=$BUILD_DATE \
       org.label-schema.schema-version="1.0.0-rc1"
 
 RUN apt-get update -y && \
-    apt-get install -y python2.7 python-pip
+    apt-get install -y git python2.7 python-pip
 
 ADD . /ingredient-phrase-tagger
 WORKDIR /ingredient-phrase-tagger
