@@ -1,4 +1,4 @@
-import csv
+import unicodecsv
 
 _REQUIRED_COLUMNS = ['input', 'name', 'qty', 'range_end', 'unit', 'comment']
 
@@ -26,7 +26,7 @@ class Reader(object):
     """
 
     def __init__(self, data_file):
-        self._csv_reader = csv.DictReader(data_file)
+        self._csv_reader = unicodecsv.DictReader(data_file)
         for required_column in _REQUIRED_COLUMNS:
             if required_column not in self._csv_reader.fieldnames:
                 raise InvalidHeaderError(
@@ -67,12 +67,12 @@ def _parse_row(row):
         range_end = float(row['range_end'])
 
     return {
-        'input': row['input'].decode('utf-8'),
-        'name': row['name'].decode('utf-8'),
+        'input': row['input'],
+        'name': row['name'],
         'qty': float(row['qty']),
         'range_end': range_end,
-        'unit': row['unit'].decode('utf-8'),
-        'comment': row['comment'].decode('utf-8'),
+        'unit': row['unit'],
+        'comment': row['comment'],
     }
 
 
@@ -80,7 +80,7 @@ class Writer(object):
     """Writes labelled ingredient data to a CSV file."""
 
     def __init__(self, data_file):
-        self._csv_writer = csv.DictWriter(
+        self._csv_writer = unicodecsv.DictWriter(
             data_file, fieldnames=_REQUIRED_COLUMNS, lineterminator='\n')
         self._csv_writer.writeheader()
 
