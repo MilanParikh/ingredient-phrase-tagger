@@ -12,14 +12,15 @@ set -x
 if [ -z "$LABELLED_DATA_FILE" ];
   then echo "LABELLED_DATA_FILE must be set" && exit 1;
 fi
-if [ -z "$LABELLED_EXAMPLE_COUNT" ];
-  then echo "LABELLED_EXAMPLE_COUNT must be set" && exit 1;
-fi
+
 if [ -z "$OUTPUT_DIR" ];
   then echo "OUTPUT_DIR must be set" && exit 1;
 fi
 
 # Choose defaults for optional vars.
+if [ -z "$LABELLED_EXAMPLE_COUNT" ];
+  then LABELLED_EXAMPLE_COUNT=0;
+fi
 if [ -z "$TRAINING_DATA_PERCENT" ];
   then TRAINING_DATA_PERCENT=0.9;
 fi
@@ -29,6 +30,9 @@ fi
 
 COUNT_TRAIN=$(python -c "print int($TRAINING_DATA_PERCENT * $LABELLED_EXAMPLE_COUNT)")
 COUNT_TEST=$(python -c "print int((1.0 - $TRAINING_DATA_PERCENT) * $LABELLED_EXAMPLE_COUNT)")
+
+TRAINING_LABELS_FILE="${OUTPUT_DIR}/training_labels.csv"
+TESTING_LABELS_FILE="${OUTPUT_DIR}/testing_labels.csv"
 
 CRF_TRAINING_FILE="${OUTPUT_DIR}/training_data.crf"
 CRF_TESTING_FILE="${OUTPUT_DIR}/testing_data.crf"
@@ -43,15 +47,18 @@ CRF_MODEL_FILE="${OUTPUT_DIR}/${MODEL_TIMESTAMP}-${DATA_VERSION}-${CODE_VERSION}
 TESTING_OUTPUT_FILE="${OUTPUT_DIR}/testing_output"
 EVAL_OUTPUT_FILE="${OUTPUT_DIR}/eval_output"
 
-bin/generate_data \
-  --data-path="$LABELLED_DATA_FILE" \
-  --count="$COUNT_TRAIN" \
-  --offset=0 > "$CRF_TRAINING_FILE"
+bin/partition-labels.py \
+  --label-path="$LABELLED_DATA_FILE" \
+  --training-path="$TRAINING_LABELS_FILE" \
+  --testing-path="$TESTING_LABELS_FILE" \
+  --training-fraction="$TRAINING_DATA_PERCENT" \
+  --max-labels="$LABELLED_EXAMPLE_COUNT"
 
 bin/generate_data \
-  --data-path="$LABELLED_DATA_FILE" \
-  --count="$COUNT_TEST" \
-  --offset=$COUNT_TRAIN > "$CRF_TESTING_FILE"
+  --data-path="$TRAINING_LABELS_FILE" > "$CRF_TRAINING_FILE"
+
+bin/generate_data \
+  --data-path="$TESTING_LABELS_FILE" > "$CRF_TESTING_FILE"
 
 crf_learn \
   --thread="$CRF_TRAINING_THREADS" \

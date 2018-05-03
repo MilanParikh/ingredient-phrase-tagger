@@ -8,26 +8,15 @@ class Cli(object):
 
     def __init__(self, argv):
         self.opts = self._parse_args(argv)
-        self._upstream_cursor = None
 
     def run(self):
-        self.generate_data(self.opts.count, self.opts.offset)
-
-    def generate_data(self, count, offset):
         """
         Generates training data in the CRF++ format for the ingredient
         tagging task
         """
-
-        start = int(offset)
-        end = int(offset) + int(count)
-
         with open(self.opts.data_path) as data_file:
             data_reader = labelled_data.Reader(data_file)
-            for index, row in enumerate(data_reader):
-                if index < start or index >= end:
-                    continue
-
+            for row in data_reader:
                 print translator.translate_row(row).encode('utf-8')
 
     def _parse_args(self, argv):
@@ -37,8 +26,6 @@ class Cli(object):
 
         opts = optparse.OptionParser()
 
-        opts.add_option("--count", default="100", help="(%default)")
-        opts.add_option("--offset", default="0", help="(%default)")
         opts.add_option(
             "--data-path",
             default="nyt-ingredients-snapshot-2015.csv",

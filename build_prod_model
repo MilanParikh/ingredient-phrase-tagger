@@ -16,7 +16,6 @@ set -e
 set -x
 
 export LABELLED_DATA_FILE=nyt-ingredients-snapshot-2015.csv
-export LABELLED_EXAMPLE_COUNT=179207
 export TRAINING_DATA_PERCENT=0.9
 if [ -z "$1" ];
   then echo "Usage: ./build_prod_model output_dir";
