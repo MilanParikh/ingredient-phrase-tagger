@@ -1,0 +1,46 @@
+#!/bin/bash
+
+# Builds a new model within a docker container using production settings.
+#
+# Example
+#  $ mkdir ~/models
+#  $ ./docker_train_prod_model ~/models
+
+# Exit build script on first failure
+set -e
+
+# Echo commands to stdout.
+set -x
+
+if [ -z "$1" ];
+  then echo "Usage: ./docker_train_prod_model output_dir" && exit 1;
+fi
+OUTPUT_DIR="$1"
+
+IMAGE_NAME="ingredient-phrase-tagger-image"
+CONTAINER_NAME="ingredient-phrase-tagger-model-builder"
+
+docker version
+
+docker rm -f "$CONTAINER_NAME" || true
+
+docker build \
+  --tag "$IMAGE_NAME" \
+  .
+
+docker run \
+  --tty \
+  --detach \
+  --name "$CONTAINER_NAME" \
+  "$IMAGE_NAME"
+
+DOCKER_MODEL_DIR=/models
+
+docker exec "$CONTAINER_NAME" mkdir "${DOCKER_MODEL_DIR}"
+docker exec "$CONTAINER_NAME" bin/train-prod-model "${DOCKER_MODEL_DIR}"
+FIND_MODEL_CMD="ls ${DOCKER_MODEL_DIR}/*.crfmodel"
+DOCKER_MODEL_PATH=$(docker exec "$CONTAINER_NAME" sh -c "$FIND_MODEL_CMD")
+docker cp "${CONTAINER_NAME}:${DOCKER_MODEL_PATH}" "${OUTPUT_DIR}/"
+
+MODEL_FILE="$(ls ${OUTPUT_DIR}/*.crfmodel)"
+echo "Trained new model: $MODEL_FILE"
