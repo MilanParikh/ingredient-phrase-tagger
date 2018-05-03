@@ -12,7 +12,6 @@ set -x
 if [ -z "$LABELLED_DATA_FILE" ];
   then echo "LABELLED_DATA_FILE must be set" && exit 1;
 fi
-
 if [ -z "$OUTPUT_DIR" ];
   then echo "OUTPUT_DIR must be set" && exit 1;
 fi
