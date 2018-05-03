@@ -75,7 +75,7 @@ class WriterTest(unittest.TestCase):
     def test_writes_valid_rows(self):
         mock_file = io.BytesIO()
         writer = labelled_data.Writer(mock_file)
-        mock_rows = [{
+        writer.writerows([{
             'input': u'4 to 6 large cloves garlic',
             'qty': 4.0,
             'unit': u'clove',
@@ -102,9 +102,48 @@ class WriterTest(unittest.TestCase):
             0.0,
             'comment': (u'(about 6 peppers in assorted colors), cut into '
                         u'2-inch chunks'),
-        }]
-        for row in mock_rows:
-            writer.writerow(row)
+        }])
+        self.assertMultiLineEqual("""
+input,name,qty,range_end,unit,comment
+4 to 6 large cloves garlic,garlic,4.0,6.0,clove,
+3 bananas,bananas,3.0,0.0,,
+"2 1/2 pounds bell peppers (about 6 peppers in assorted colors), cut into 2-inch chunks",bell peppers,2.5,0.0,pound,"(about 6 peppers in assorted colors), cut into 2-inch chunks"
+""".strip(),
+                                  mock_file.getvalue().strip())
+
+    def test_writes_valid_rows_one_by_one(self):
+        mock_file = io.BytesIO()
+        writer = labelled_data.Writer(mock_file)
+        writer.writerow({
+            'input': u'4 to 6 large cloves garlic',
+            'qty': 4.0,
+            'unit': u'clove',
+            'name': u'garlic',
+            'range_end': 6.0,
+            'comment': u'',
+        })
+        writer.writerow({
+            'input': u'3 bananas',
+            'qty': 3.0,
+            'unit': u'',
+            'name': u'bananas',
+            'comment': u'',
+            'range_end': 0.0,
+        })
+        writer.writerow({
+            'input': (u'2 1/2 pounds bell peppers (about 6 peppers in '
+                      u'assorted colors), cut into 2-inch chunks'),
+            'qty':
+            2.5,
+            'unit':
+            u'pound',
+            'name':
+            u'bell peppers',
+            'range_end':
+            0.0,
+            'comment': (u'(about 6 peppers in assorted colors), cut into '
+                        u'2-inch chunks'),
+        })
         self.assertMultiLineEqual("""
 input,name,qty,range_end,unit,comment
 4 to 6 large cloves garlic,garlic,4.0,6.0,clove,

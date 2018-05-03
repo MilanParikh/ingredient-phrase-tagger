@@ -99,3 +99,7 @@ class Writer(object):
                 * comment
         """
         self._csv_writer.writerow(row)
+
+    def writerows(self, rows):
+        """Writes multiple rows to the output CSV file."""
+        self._csv_writer.writerows(rows)
