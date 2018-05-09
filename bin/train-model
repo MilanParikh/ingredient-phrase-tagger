@@ -61,7 +61,7 @@ bin/generate_data \
 
 crf_learn \
   --thread="$CRF_TRAINING_THREADS" \
-  "$CRF_LEARN_TEMPLATE" "$CRF_TESTING_FILE" "$CRF_MODEL_FILE"
+  "$CRF_LEARN_TEMPLATE" "$CRF_TRAINING_FILE" "$CRF_MODEL_FILE"
 
 crf_test \
   --model="$CRF_MODEL_FILE" \
