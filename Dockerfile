@@ -13,8 +13,8 @@ LABEL org.label-schema.build-date=$BUILD_DATE \
 RUN apt-get update -y && \
     apt-get install -y git python2.7 python-pip
 
-ADD . /ingredient-phrase-tagger
-WORKDIR /ingredient-phrase-tagger
+ADD . /app
+WORKDIR /app
 
 RUN python setup.py install
 
