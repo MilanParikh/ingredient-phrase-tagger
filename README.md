@@ -14,6 +14,18 @@ This fork maintains the design of the original ingredient-phrase-tagger, but add
 * Adds end-to-end tests.
 * Enforces rules for source formatting and linting.
 
+These improvements were described in a series of blog posts on [mtlynch.io](https://mtlynch.io):
+
+* [Resurrecting a Dead Library: Part One - Resuscitation](https://mtlynch.io/resurrecting-1/)
+* [Resurrecting a Dead Library: Part Two - Stabilization](https://mtlynch.io/resurrecting-2/)
+* [Resurrecting a Dead Library: Part Three - Rehabilitation](https://mtlynch.io/resurrecting-3/)
+
+## Zestful
+
+[Zestful](https://zestfuldata.com) is a managed ingredient-parsing service based on this library. It has higher accuracy and more frequent updates:
+
+* https://zestfuldata.com
+
 ## Overview
 
 This repo contains scripts to extract the Quantity, Unit, Name, and Comments
