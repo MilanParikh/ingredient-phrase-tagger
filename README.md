@@ -78,68 +78,48 @@ docker pull mtlynch/ingredient-phrase-tagger
 
 ## Quick Start
 
-The most common usage is to train the model with a subset of our data, test the
-model against a different subset, then visualize the results. We provide a shell
-script to do this, at:
+To begin, you must train a model:
 
-    ./roundtrip.sh
+```bash
+MODEL_DIR=$(mktemp -d)
+./docker_train_prod_model $MODEL_DIR
+MODEL_FILE=$(find $MODEL_DIR -name '*.crfmodel')
+```
 
-You can edit this script to specify the size of your training and testing set.
-The default is 20k training examples and 2k test examples.
+From there, you can convert ingredients by piping them into stdin:
 
+```bash
+echo '
+2 tablespoons honey
+1/2 cup flour
+Black pepper, to taste' | bin/parse-ingredients.py --model-file $MODEL_FILE
+```
 
-## Usage
-
-### Training
-
-To train the model, we must first convert our input data into a format which
-`crf_learn` can accept:
-
-    bin/generate_data --data-path=input.csv --count=1000 --offset=0 > tmp/train_file
-
-The `count` argument specifies the number of training examples (i.e. ingredient
-lines) to read, and `offset` specifies which line to start with. There are
-roughly 180k examples in our snapshot of the New York Times cooking database
-(which we include in this repo), so it is useful to run against a subset.
-
-The output of this step looks something like:
-
-    1            I1      L8      NoCAP  NoPAREN  B-QTY
-    cup          I2      L8      NoCAP  NoPAREN  B-UNIT
-    white        I3      L8      NoCAP  NoPAREN  B-NAME
-    wine         I4      L8      NoCAP  NoPAREN  I-NAME
-
-    1/2          I1      L4      NoCAP  NoPAREN  B-QTY
-    cup          I2      L4      NoCAP  NoPAREN  B-UNIT
-    sugar        I3      L4      NoCAP  NoPAREN  B-NAME
-
-    2            I1      L8      NoCAP  NoPAREN  B-QTY
-    tablespoons  I2      L8      NoCAP  NoPAREN  B-UNIT
-    dry          I3      L8      NoCAP  NoPAREN  B-NAME
-    white        I4      L8      NoCAP  NoPAREN  I-NAME
-    wine         I5      L8      NoCAP  NoPAREN  I-NAME
-
-Next, we pass this file to `crf_learn`, to generate a model file:
-
-    crf_learn template_file tmp/train_file tmp/model_file
-
-
-### Testing
-
-To use the model to tag your own arbitrary ingredient lines (stored here in
-`input.txt`), you must first convert it into the CRF++ format, then run against
-the model file which we generated above. We provide another helper script to do
-this:
-
-    python bin/parse-ingredients.py input.txt > results.txt
-
-The output is also in CRF++ format, which isn't terribly helpful to us. To
-convert it into JSON:
-
-    python bin/convert-to-json.py results.txt > results.json
-
-See the top of this README for an example of the expected output.
-
+```text
+[
+  {
+    "display": "<span class='qty'>2</span><span class='unit'>tablespoons</span><span class='name'>honey</span>",
+    "input": "2 tablespoons honey",
+    "name": "honey",
+    "qty": "2",
+    "unit": "tablespoon"
+  },
+  {
+    "display": "<span class='qty'>1/2</span><span class='unit'>cup</span><span class='name'>flour</span>",
+    "input": "1/2 cup flour",
+    "name": "flour",
+    "qty": "1/2",
+    "unit": "cup"
+  },
+  {
+    "comment": "to taste",
+    "display": "<span class='name'>Black pepper</span><span class='other'>,</span><span class='comment'>to taste</span>",
+    "input": "Black pepper, to taste",
+    "name": "Black pepper",
+    "other": ","
+  }
+]
+```
 
 ## Authors
 

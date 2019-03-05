@@ -1,23 +1,36 @@
 #!/usr/bin/env python
-from __future__ import print_function
 
+import argparse
+import json
 import sys
-import os
+import subprocess
 import tempfile
 
 from ingredient_phrase_tagger.training import utils
 
-if len(sys.argv) < 2:
-    sys.stderr.write('Usage: parse-ingredients.py FILENAME')
-    sys.exit(1)
 
-FILENAME = str(sys.argv[1])
-_, tmpFile = tempfile.mkstemp()
+def _exec_crf_test(input_text, model_path):
+    with tempfile.NamedTemporaryFile() as input_file:
+        input_file.write(utils.export_data(input_text))
+        input_file.flush()
+        return subprocess.check_output(
+            ['crf_test', '--verbose=1', '--model', model_path,
+             input_file.name]).decode('utf-8')
 
-with open(FILENAME) as infile, open(tmpFile, 'w') as outfile:
-    outfile.write(utils.export_data(infile.readlines()))
 
-tmpFilePath = "../tmp/model_file"
-modelFilename = os.path.join(os.path.dirname(__file__), tmpFilePath)
-os.system("crf_test -v 1 -m %s %s" % (modelFilename, tmpFile))
-os.system("rm %s" % tmpFile)
+def _convert_crf_output_to_json(crf_output):
+    return json.dumps(utils.import_data(crf_output), indent=2, sort_keys=True)
+
+
+def main(args):
+    raw_ingredient_lines = [x for x in sys.stdin.readlines() if x]
+    crf_output = _exec_crf_test(raw_ingredient_lines, args.model_file)
+    print _convert_crf_output_to_json(crf_output.split('\n'))
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(
+        prog='Ingredient Phrase Tagger',
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument('-m', '--model-file', required=True)
+    main(parser.parse_args())
