@@ -16,7 +16,7 @@ RUN apt-get update -y && \
 ADD . /app
 WORKDIR /app
 
-RUN python setup.py install
+RUN python2 setup.py install
 
 # Clean up.
 RUN rm -rf /var/lib/apt/lists/* && \
