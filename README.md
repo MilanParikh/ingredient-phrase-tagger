@@ -78,17 +78,15 @@ docker pull mtlynch/ingredient-phrase-tagger
 
 ## Quick Start
 
-To begin, you must train a model:
-
 ```bash
+docker run -it mtlynch/ingredient-phrase-tagger bash
+
+# Train a new model
 MODEL_DIR=$(mktemp -d)
-./docker_train_prod_model $MODEL_DIR
+bin/train-prod-model "$MODEL_DIR"
 MODEL_FILE=$(find $MODEL_DIR -name '*.crfmodel')
-```
 
-From there, you can convert ingredients by piping them into stdin:
-
-```bash
+# Parse some ingredients
 echo '
 2 tablespoons honey
 1/2 cup flour
