@@ -18,6 +18,8 @@ class TokenizerTest(unittest.TestCase):
         pairs = [
             ('100g melted chocolate', ['100', 'grams', 'melted', 'chocolate']),
             ('8oz diet coke', ['8', 'ounces', 'diet', 'coke']),
+            ('15ml coconut oil', ['15', 'milliliters', 'coconut', 'oil']),
+            ('15mL coconut oil', ['15', 'milliliters', 'coconut', 'oil']),
         ]
         for ingredient, tokens_expected in pairs:
             tokens_actual = tokenizer.tokenize(ingredient)
