@@ -18,6 +18,7 @@ class Cli(object):
             data_reader = labelled_data.Reader(data_file)
             for row in data_reader:
                 print translator.translate_row(row).encode('utf-8')
+                
 
     def _parse_args(self, argv):
         """

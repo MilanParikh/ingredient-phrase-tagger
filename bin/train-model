@@ -59,12 +59,12 @@ bin/generate_data \
 bin/generate_data \
   --data-path="$TESTING_LABELS_FILE" > "$CRF_TESTING_FILE"
 
-crf_learn \
-  --thread="$CRF_TRAINING_THREADS" \
-  "$CRF_LEARN_TEMPLATE" "$CRF_TRAINING_FILE" "$CRF_MODEL_FILE"
+# crf_learn \
+#   --thread="$CRF_TRAINING_THREADS" \
+#   "$CRF_LEARN_TEMPLATE" "$CRF_TRAINING_FILE" "$CRF_MODEL_FILE"
 
-crf_test \
-  --model="$CRF_MODEL_FILE" \
-  "$CRF_TESTING_FILE" > "$TESTING_OUTPUT_FILE"
+# crf_test \
+#   --model="$CRF_MODEL_FILE" \
+#   "$CRF_TESTING_FILE" > "$TESTING_OUTPUT_FILE"
 
-python bin/evaluate.py "$TESTING_OUTPUT_FILE" > "$EVAL_OUTPUT_FILE"
+# python bin/evaluate.py "$TESTING_OUTPUT_FILE" > "$EVAL_OUTPUT_FILE"

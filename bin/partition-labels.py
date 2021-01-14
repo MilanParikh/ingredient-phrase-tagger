@@ -1,6 +1,5 @@
 #!/usr/bin/python2
 import argparse
-
 from ingredient_phrase_tagger.training import labelled_data
 from ingredient_phrase_tagger.training import partitioner
 

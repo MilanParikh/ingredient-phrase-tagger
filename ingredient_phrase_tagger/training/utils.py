@@ -5,7 +5,7 @@ import tokenizer
 
 
 def joinLine(columns):
-    return "\t".join(columns)
+    return "".join(columns)
 
 
 def clumpFractions(s):

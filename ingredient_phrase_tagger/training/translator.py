@@ -24,12 +24,13 @@ def translate_row(row):
 
     labels = _row_to_labels(row)
     label_data = _addPrefixes([(t, _matchUp(t, labels)) for t in tokens])
-
     translated = ''
     for i, (token, tags) in enumerate(label_data):
         features = utils.getFeatures(token, i + 1, tokens)
         translated += utils.joinLine(
-            [token] + features + [_bestTag(tags)]) + '\n'
+            [_bestTag(tags)] + [' '])
+        #translated += utils.joinLine(
+        #    [token] + [_bestTag(tags)])
     return translated
 
 
